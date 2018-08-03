@@ -2,8 +2,11 @@ language: python
 python:
   - "2.7"
 
-    #deploy:
-        #provider: heroku
-        #app: tac-server
-        #api_key:
-        #secure: $HEROKU_API_KEY
+script:
+    - echo "No test yet"
+
+deploy:
+  provider: heroku
+  app: tac-server
+  api_key:
+  secure: $HEROKU_API_KEY
