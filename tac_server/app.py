@@ -11,7 +11,7 @@ from falcon_cors import CORS
 from .resources.mpd import Mpds
 from .resources.mpd import Mpd
 
-cors = CORS(allow_all_origins=True)
+cors = CORS(allow_all_origins=True, allow_all_headers=True)
 api = application = falcon.API(middleware=[cors.middleware])
 
 MPD = Mpd()
