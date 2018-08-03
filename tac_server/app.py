@@ -6,12 +6,13 @@
 """
 
 import falcon
+from falcon_cors import CORS
 
 from .resources.mpd import Mpds
 from .resources.mpd import Mpd
 
-
-api = application = falcon.API()
+cors = CORS(allow_all_origins=True)
+api = application = falcon.API(middleware=[cors.middleware])
 
 MPD = Mpd()
 MPDS = Mpds()
