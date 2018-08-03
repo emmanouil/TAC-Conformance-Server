@@ -7,10 +7,14 @@
 
 import falcon
 
-from .resources.mpd import MPD
+from .resources.mpd import Mpds
+from .resources.mpd import Mpd
 
 
 api = application = falcon.API()
 
-mpds = MPD()
-api.add_route('/mpds', mpds)
+MPD = Mpd()
+MPDS = Mpds()
+
+api.add_route('/mpds/', MPDS)
+api.add_route('/mpds/{mpd_id}', MPD)
