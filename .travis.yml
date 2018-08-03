@@ -9,4 +9,4 @@ deploy:
   provider: heroku
   app: tac-server
   api_key:
-  secure: $HEROKU_API_KEY
+    secure: $HEROKU_API_KEY
