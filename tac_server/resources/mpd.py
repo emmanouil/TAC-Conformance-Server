@@ -60,6 +60,9 @@ class Mpd(object):
         if mode == 'proxy':
             base_url.base_url_value = "/proxy{}".format(
                 MPDS['mpds'][mpd_id]['base_url'])
+        elif mode == 'simulation':
+            base_url.base_url_value = "/simulation{}".format(
+                MPDS['mpds'][mpd_id]['base_url'])
         elif mode == 'validation':
             base_url.base_url_value = "/validation{}".format(
                 MPDS['mpds'][mpd_id]['base_url'])
@@ -68,7 +71,7 @@ class Mpd(object):
             resp.status = falcon.HTTP_400
             resp.body = json.dumps({
                 'message': 'Please provide a mode in the request '
-                           'as query string: mode=proxy or mode=validation.'
+                           'as query string: mode=proxy|simulation|validation.'
             })
             return
 
