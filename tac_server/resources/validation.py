@@ -71,7 +71,7 @@ class Validation(object):
 
         LOGGER.info('Access Token decoded: {}'.format(decoded_token))
 
-        # Step 3 - Verify that the Access Token contain the stt claim
+        # Step 3 - Verify that the Access Token contains the cdnistt claim
         # and that the value is "2"
         if 'cdnistt' in decoded_token:
             if decoded_token['cdnistt'] == 2:
@@ -81,17 +81,17 @@ class Validation(object):
                              'but {}.'.format(decoded_token['cdnistt']))
                 resp.body = json.dumps({
                     'success': False,
-                    'message': 'Acces Token does not have a CDNI Signed '
+                    'message': 'Access Token does not have a CDNI Signed '
                                'Token Transport (cdnistt) claim'
                 })
                 resp.status = falcon.HTTP_400
                 return
         else:
-            LOGGER.error('KO|Acces Token does not have a CDNI Signed '
+            LOGGER.error('KO|Access Token does not have a CDNI Signed '
                          'Token Transport (cdnistt) claim.')
             resp.body = json.dumps({
                 'success': False,
-                'message': 'Acces Token does not have a CDNI Signed '
+                'message': 'Access Token does not have a CDNI Signed '
                            'Token Transport (cdnistt) claim'
             })
             resp.status = falcon.HTTP_400
