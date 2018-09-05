@@ -32,18 +32,20 @@ class Validation(object):
         encoded_token = ""
         decoded_token = ""
         for query_string in req.query_string.split('&'):
-            key, value = query_string.split('=')
-            if key == TAC_QUERY_STRING:
-                if tac_query_found:
-                    LOGGER.warning('A second TAC query string found:'
-                                   ' key={}, value={}'.format(key, value))
-                    LOGGER.warning('This seconf TAC query string will '
-                                   'be discarded in the validation process.')
-                else:
-                    LOGGER.info('OK|A TAC query string found:'
-                                ' key={}, value={}'.format(key, value))
-                    encoded_token = value
-                    tac_query_found = True
+            if query_string != "":
+                key, value = query_string.split('=')
+                if key == TAC_QUERY_STRING:
+                    if tac_query_found:
+                        LOGGER.warning('A second TAC query string found:'
+                                       ' key={}, value={}'.format(key, value))
+                        LOGGER.warning('This seconf TAC query string will '
+                                       'be discarded in the validation '
+                                       'process.')
+                    else:
+                        LOGGER.info('OK|A TAC query string found:'
+                                    ' key={}, value={}'.format(key, value))
+                        encoded_token = value
+                        tac_query_found = True
 
         if not tac_query_found:
             LOGGER.error('KO|No TAC query string was found.')
