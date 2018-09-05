@@ -79,12 +79,13 @@ class Validation(object):
             if decoded_token['cdnistt'] == 2:
                 LOGGER.info('OK|The cdnistt claim value is 2')
             else:
-                LOGGER.error('KO|The cdnistt claim value is not 2 '
+                LOGGER.error('KO|The cdnistt claim value found is not 2 '
                              'but {}.'.format(decoded_token['cdnistt']))
                 resp.body = json.dumps({
                     'success': False,
-                    'message': 'Access Token does not have a CDNI Signed '
-                               'Token Transport (cdnistt) claim'
+                    'message': 'Access Token does have a CDNI Signed '
+                               'Token Transport (cdnistt) claim but with a '
+                               'wrong value.'
                 })
                 resp.status = falcon.HTTP_400
                 return
