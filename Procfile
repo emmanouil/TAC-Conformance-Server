@@ -1,1 +1,1 @@
-web: gunicorn tac_server.app
+web: gunicorn tac_server.app:API
