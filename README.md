@@ -4,11 +4,11 @@ HTTP server conformance for TAC
 
 ## REST API
 
-/mpds
+/mpd
 
 Return a list of MPDs that can be used with the TAC server
 
-/mpds/:id?mode=proxy|validation|simulation
+/mpd/:id?mode=proxy|validation|simulation
 
 Returns an MPD configured for the requested mode:
 

@@ -8,15 +8,57 @@
 import json
 
 import requests
-
 import jwt
-
 import falcon
 
 from tac_server.logger import init_logging
 from tac_server.tac import TAC_QUERY_STRING
 
 LOGGER = init_logging()
+
+def is_access_token_valid(encoded_token):
+    """
+    Validate that an Access Token is well-formatted.
+    """
+    try:
+        decoded_token = jwt.decode(encoded_token, verify=False) # Rule TAC1
+    except jwt.exceptions.InvalidTokenError as error:
+        LOGGER.error(error)
+        LOGGER.error('KO|The string is not a JWT.')
+        response = json.dumps({
+            'success': False,
+            'message': 'String is not a JWT.'
+        })
+        return (False, response)
+
+    LOGGER.info('Access Token decoded: {}'.format(decoded_token))
+
+    # Step 3 - Verify that the Access Token contains the cdnistt claim
+    # and that the value is "2"
+    if 'cdnistt' in decoded_token:
+        if decoded_token['cdnistt'] == 2: # Rule TAC2
+            LOGGER.info('OK|The cdnistt claim value is 2')
+        else:
+            LOGGER.error('KO|The cdnistt claim value found is not 2 '
+                         'but {}.'.format(decoded_token['cdnistt']))
+            response = json.dumps({
+                'success': False,
+                'message': 'Access Token does have a CDNI Signed '
+                           'Token Transport (cdnistt) claim but with a '
+                           'wrong value.'
+            })
+            return (False, response)
+    else:
+        LOGGER.error('KO|Access Token does not have a CDNI Signed '
+                     'Token Transport (cdnistt) claim.')
+        response = json.dumps({
+            'success': False,
+            'message': 'Access Token does not have a CDNI Signed '
+                       'Token Transport (cdnistt) claim'
+        })
+        return (False, response)
+
+    return (True, '')
 
 class Validation(object):
     """
@@ -57,51 +99,26 @@ class Validation(object):
             resp.status = falcon.HTTP_400
             return
 
-        # Step 2 - Verify the format of the token
-        try:
-            decoded_token = jwt.decode(encoded_token, verify=False)
-        except jwt.exceptions.InvalidTokenError as error:
-            LOGGER.error(error)
-            LOGGER.error('KO|String in TAC query string is not a JWT.')
-            resp.body = json.dumps({
-                'success': False,
-                'message': 'String in TAC query string is not a JWT.'
-            })
+        # Step 2 - Verify the format of the token - Rule TAC5
+        token_valid, message = is_access_token_valid(encoded_token)
+        if not token_valid:
+            resp.body = message
             resp.status = falcon.HTTP_400
             return
-
-
-        LOGGER.info('Access Token decoded: {}'.format(decoded_token))
-
-        # Step 3 - Verify that the Access Token contains the cdnistt claim
-        # and that the value is "2"
-        if 'cdnistt' in decoded_token:
-            if decoded_token['cdnistt'] == 2:
-                LOGGER.info('OK|The cdnistt claim value is 2')
-            else:
-                LOGGER.error('KO|The cdnistt claim value found is not 2 '
-                             'but {}.'.format(decoded_token['cdnistt']))
-                resp.body = json.dumps({
-                    'success': False,
-                    'message': 'Access Token does have a CDNI Signed '
-                               'Token Transport (cdnistt) claim but with a '
-                               'wrong value.'
-                })
-                resp.status = falcon.HTTP_400
-                return
-        else:
-            LOGGER.error('KO|Access Token does not have a CDNI Signed '
-                         'Token Transport (cdnistt) claim.')
-            resp.body = json.dumps({
-                'success': False,
-                'message': 'Access Token does not have a CDNI Signed '
-                           'Token Transport (cdnistt) claim'
-            })
-            resp.status = falcon.HTTP_400
-            return
-
 
         response = requests.get('https://{}'.format(
             req.path.replace('/validation/', '')))
+        if 'DASH-IF-IETF-Token' in response.headers:
+            LOGGER.debug('The TAC HTTP header has been found in the '
+                         'response from the server')
+            token_valid, message = is_access_token_valid(encoded_token) # Rule TAC4
+            if not token_valid:
+                resp.body = message
+                resp.status = falcon.HTTP_400
+                return
+        else:
+            LOGGER.debug('The TAC HTTP header has not been found in the '
+                         'response from the server')
+
         resp.content_type = response.headers['Content-Type']
         resp.body = response.content
