@@ -6,7 +6,7 @@ future==0.16.0
 gunicorn==19.9.0
 idna==2.7
 mpegdash==0.1.5
-PyJWT==1.6.4
+PyJWT==2.4.0
 python-mimeparse==1.6.0
 requests==2.20.1
 six==1.11.0
